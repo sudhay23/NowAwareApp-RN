@@ -22,14 +22,7 @@ export default function App() {
 			clearInterval(scanIntervals);
 			BtFunctions.stopScanDevices();
 
-			// Setup onDeviceDisconnected
-			// manager.onDeviceDisconnected(connectedDevice.id, (err, device) => {
-			// 	console.log(
-			// 		"Device got disconnected...Resuming Scan Intervals..."
-			// 	);
-			// 	setConnectedDevice(null);
-			// 	setDevicePayloadMsg(null);
-			// });
+			// Setup onDisconnected
 			disconnectionSubscription = connectedDevice.onDisconnected(
 				(err, device) => {
 					console.log(
@@ -42,7 +35,7 @@ export default function App() {
 				}
 			);
 
-			// Obtain the payload characteristic message
+			// Obtain the payload characteristic message ---> Initiate TTS Read from there
 			BtFunctions.readCharacteristicMsg(
 				connectedDevice,
 				setDevicePayloadMsg
@@ -71,6 +64,7 @@ export default function App() {
 					title="Force Disconnect"
 					color="red"
 					onPress={BtFunctions.disconnectDevices}
+					style={styles.forceDisconnectBtn}
 				/>
 			) : (
 				<></>
@@ -85,5 +79,8 @@ const styles = StyleSheet.create({
 		backgroundColor: "#fff",
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	forceDisconnectBtn: {
+		marginVertical: 10,
 	},
 });

@@ -1,5 +1,6 @@
 import { BleManager } from "react-native-ble-plx";
 import { Alert } from "react-native";
+import ttsModule from "./ttsModule";
 import base64 from "react-native-base64";
 let manager;
 let connectedDeviceInstance = null;
@@ -58,7 +59,11 @@ const readCharacteristicMsg = async (connectedDevice, setDevicePayloadMsg) => {
 		characteristics[0].serviceUUID,
 		characteristics[0].uuid
 	);
-	setDevicePayloadMsg(base64.decode(msg.value));
+	const payloadMessage = base64.decode(msg.value);
+	setDevicePayloadMsg(payloadMessage);
+
+	// Initiate TTS Read out
+	ttsModule.initiateReadOut(JSON.parse(payloadMessage));
 };
 
 const fnObj = {
