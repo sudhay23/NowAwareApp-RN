@@ -1,16 +1,9 @@
 import { useState, useEffect } from "react";
-import {
-	StyleSheet,
-	Text,
-	View,
-	Button,
-	Alert,
-	FlatList,
-	ToastAndroid,
-} from "react-native";
+import { StyleSheet, Text, View, Button, ToastAndroid } from "react-native";
 import BtFunctions from "./utils/btFunctions";
 
 let manager;
+let disconnectionSubscription;
 
 export default function App() {
 	const [connectedDevice, setConnectedDevice] = useState(null);
@@ -30,12 +23,30 @@ export default function App() {
 			BtFunctions.stopScanDevices();
 
 			// Setup onDeviceDisconnected
-			manager.onDeviceDisconnected(connectedDevice.id, (err, device) => {
-				console.log(
-					"Device got disconnected...Resuming Scan Intervals..."
-				);
-				setConnectedDevice(null);
-			});
+			// manager.onDeviceDisconnected(connectedDevice.id, (err, device) => {
+			// 	console.log(
+			// 		"Device got disconnected...Resuming Scan Intervals..."
+			// 	);
+			// 	setConnectedDevice(null);
+			// 	setDevicePayloadMsg(null);
+			// });
+			disconnectionSubscription = connectedDevice.onDisconnected(
+				(err, device) => {
+					console.log(
+						"Device got disconnected...Resuming Scan Intervals..."
+					);
+					disconnectionSubscription.remove(); //Remove subscription to this disconnect listener as this device is no longer existing
+					disconnectionSubscription = null;
+					setConnectedDevice(null);
+					setDevicePayloadMsg(null);
+				}
+			);
+
+			// Obtain the payload characteristic message
+			BtFunctions.readCharacteristicMsg(
+				connectedDevice,
+				setDevicePayloadMsg
+			);
 		} else {
 			scanIntervals = setInterval(() => {
 				BtFunctions.startScanDevices(setConnectedDevice, scanIntervals);
@@ -52,6 +63,18 @@ export default function App() {
 				Connected Device:{" "}
 				{connectedDevice ? connectedDevice.name : "NONE"}
 			</Text>
+			<Text>
+				Message Payload: {devicePayloadMsg ? devicePayloadMsg : "N/A"}
+			</Text>
+			{connectedDevice ? (
+				<Button
+					title="Force Disconnect"
+					color="red"
+					onPress={BtFunctions.disconnectDevices}
+				/>
+			) : (
+				<></>
+			)}
 		</View>
 	);
 }
