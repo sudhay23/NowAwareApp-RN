@@ -92,7 +92,8 @@ void loop() {
 
     uint32_t connectedDevices = pServer->getConnectedCount();
     pServer->getAdvertising()->start();
-    pCharacteristic -> setValue("RhuthvikIsOurLeader");
+//    pCharacteristic -> setValue("RhuthvikIsOurLeader");
+    pCharacteristic -> setValue("{\"vehicleType\":\"Fire-Engine\",\"regNo\":\"TN38DB1092\"}");
     pCharacteristic->notify();
     Serial.printf("Sent Value...Multi connection mode...Connections = %d\n",connectedDevices);  
     delay(1000);
